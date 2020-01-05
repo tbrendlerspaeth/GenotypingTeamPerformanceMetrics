@@ -1,5 +1,5 @@
 """
-This script is designed to collect and analyse data relevant to the work performance of Team 121's
+This script is designed to collect and analyse data relevant to the work performance of Team 121
 from the database entries folder.
 
 created by TABS
