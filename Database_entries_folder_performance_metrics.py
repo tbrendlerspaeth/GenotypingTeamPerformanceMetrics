@@ -1,6 +1,6 @@
 """
-This script is designed to collect and analyse data relevant to the work performance of Team 121
-from the database entries folder.
+This script is designed to collect and analyse data relevant to the work performance of a genotyping
+team from the folders were database uploads containing results are stored.
 
 created by TABS
 
