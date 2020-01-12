@@ -1,0 +1,28 @@
+11/01/2020
+Current features:
+The script collects data from Excel database uploads in whatever file it is
+pointed using a path input by the user. The folliwng information is then
+printed:
+Total number of database entries
+Total number of T121 entries
+Total number of Transnetyx entries
+Percentage of T121 retests
+Percentage of T121 failed
+Percentage of Transnetyx retests
+Percentage of Transnetyx failed
+Additionally, the script also prints out the time started and finished with
+collecting the data and generating the dataframes and the time taken.
+
+11/01/2020
+Fixes:
+- Added except statements to fix KeyError crash that occurred if
+df_all_entries had no 'Plate Barcode' or 'Plate' columns.
+- Addressed a script breakage that would occur when the df_transnetyx 
+dataframe was empty by putting the percentage of transnetyx retests and 
+failures calculations in an if statement.
+
+Changes:
+- Removed a few comments.
+- Removed the printing of times started and finished with harvesting entries
+and generating the dataframes. (Time taken still remains.)
+
