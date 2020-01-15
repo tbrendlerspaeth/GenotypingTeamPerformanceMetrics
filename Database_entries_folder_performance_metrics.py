@@ -4,7 +4,7 @@ team from the folders were database uploads containing results are stored.
 
 created by TABS
 
-version 2020.01.11
+version 2020.01.15
 
 """
 
@@ -25,7 +25,8 @@ def entries_harvest():
             try:
                 df_file = pd.read_excel(file_path)
             except:
-                print('ALERT: Exception file: ', file)
+                print('ALERT: Exception file: ', file) # figure out what exceptions are causing this to trigger?
+                                                       # permissionerror?
 
             df_all_entries = df_all_entries.append(df_file)
     df_all_entries.dropna(axis=0, how='all', inplace=True)
@@ -69,7 +70,7 @@ def entries_harvest():
     time_finished = datetime.datetime.now()
     elapsed_time = time_finished - time_started
     elapsed_time = divmod(elapsed_time.total_seconds(), 60)
-    print('Time taken for harvesting and editing: ', elapsed_time[0], 'minutes ', elapsed_time[1], 'seconds.')
+    print('Time taken for harvesting and editing: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]), 'seconds.')
 
     total_t121_entries = len(df_t121)
     total_transnetyx_entries = len(df_transnetyx)
@@ -101,7 +102,9 @@ while True:
 
 """
 Suggestions for improvement, additions, alterations:
-- Count number of different plate IDs to give some more indication of outputs for both T121 and Transnetyx
+*important*
+- *Count number of different plate IDs to give some more indication of outputs for both T121 and Transnetyx*
+
 - Highlight the most common assay names
 - Bring up the top 10 most error prone assay names for each walk.
 - ?bring up the top 10 plates with the most errors associated with them?
