@@ -26,3 +26,8 @@ Changes:
 - Removed the printing of times started and finished with harvesting entries
 and generating the dataframes. (Time taken still remains.)
 
+
+15/01/2020
+Changes:
+- Added and altered some comments.
+- The minutes and seconds for time taken for harvesting and editing now round to whole numbers
