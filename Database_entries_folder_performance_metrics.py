@@ -104,6 +104,7 @@ while True:
 Suggestions for improvement, additions, alterations:
 *important*
 - *Count number of different plate IDs to give some more indication of outputs for both T121 and Transnetyx*
+- * Count number of different mice genotyped to give another indication of output beside plates and entries*
 
 - Highlight the most common assay names
 - Bring up the top 10 most error prone assay names for each walk.

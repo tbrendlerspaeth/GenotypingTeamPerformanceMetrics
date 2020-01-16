@@ -24,7 +24,7 @@ for foldername, subfolders, filenames in os.walk(records_folder):
 # acquired only the oldest instance of a plate being involved in a plate record? Smashing idea methinks.
 # https://stackoverflow.com/questions/28161356/sort-pandas-dataframe-by-date
 # https://stackoverflow.com/questions/12497402/python-pandas-remove-duplicates-by-columns-a-keeping-the-row-with-the-highest
-
+# columns: plate, earliest record created, earliest upload date, latest upload date
 
 
 os.chdir(input(r'Please enter the path of the folder where you wish to save your excel file of the times plate records were created: '))
