@@ -4,7 +4,7 @@ team from the folders were database uploads containing results are stored.
 
 created by TABS
 
-version 2020.01.15
+version 2020.01.19
 
 """
 
@@ -24,14 +24,17 @@ def entries_harvest():
             file_path = foldername + '\\' + file
             try:
                 df_file = pd.read_excel(file_path)
+            except PermissionError:
+                print('PermissionError occurred with file: ', file)
             except:
-                print('ALERT: Exception file: ', file) # figure out what exceptions are causing this to trigger?
-                                                       # permissionerror?
+                print('There was a problem with reading this file: ', file)
 
             df_all_entries = df_all_entries.append(df_file)
+
     df_all_entries.dropna(axis=0, how='all', inplace=True)
     df_all_entries.dropna(axis=1, how='all', inplace=True)
     df_all_entries.drop_duplicates(keep='first', inplace=True)
+
 
     df_transnetyx = pd.DataFrame()
     df_t121 = pd.DataFrame()
@@ -67,19 +70,48 @@ def entries_harvest():
     except KeyError:
         print("'df_all_entries' does not contain a 'Plate' column.")
 
+
     time_finished = datetime.datetime.now()
     elapsed_time = time_finished - time_started
     elapsed_time = divmod(elapsed_time.total_seconds(), 60)
     print('Time taken for harvesting and editing: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]), 'seconds.')
 
+
     total_t121_entries = len(df_t121)
     total_transnetyx_entries = len(df_transnetyx)
     total_entries = len(df_all_entries)
+
+
+    total_t121_plates = 0
+    try:
+        df_t121_plate = df_t121[['Plate']].dropna()
+    except KeyError:
+        print("'df_t121 does not' does not contain a 'Plate' column.")
+    try:
+        df_t121_platebarcode = df_t121[['Plate Barcode']].dropna()
+        df_t121_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
+        total_t121_plates = len(df_t121_plate.append(df_t121_platebarcode).drop_duplicates())
+    except KeyError:
+        print("'df_t121 does not' does not contain a 'Plate Barcode' column.")
+
+    total_transnetyx_plates = 0
+    try:
+        df_transnetyx_plate = df_transnetyx[['Plate']].dropna()
+    except KeyError:
+        print("'df_transnetyx' does not contain a 'Plate' column.")
+    try:
+        df_transnetyx_platebarcode = df_transnetyx[['Plate Barcode']].dropna()
+        df_transnetyx_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
+        total_transnetyx_plates = len(df_transnetyx_plate.append(df_transnetyx_platebarcode).drop_duplicates())
+    except KeyError:
+        print("'df_t121 does not' does not contain a 'Plate Barcode' column.")
+
 
     failed_t121 = len(df_t121[df_t121.Genotype.isin(['Failed', 'failed', 'failed ', ' Failed '])])
     retest_t121 = len(df_t121[df_t121.Genotype.isin(['Retest', 'retest', 'retest ', 'Retest '])])
     percent_failed_t121 = (failed_t121 / total_t121_entries) * 100
     percent_retest_t121 = (retest_t121 / total_t121_entries) * 100
+
     if total_transnetyx_entries > 0:
         failed_transnetyx = len(df_transnetyx[df_transnetyx.Genotype.isin(['Failed', 'failed', 'failed ', ' Failed '])])
         retest_transnetyx = len(df_transnetyx[df_transnetyx.Genotype.isin(['Retest', 'retest', 'retest ', 'Retest '])])
@@ -88,27 +120,21 @@ def entries_harvest():
     else:
         print('The script found no entries with Transnetyx plates.')
 
+
     print('Total number of database entries: ', total_entries)
+
     print('Total number of T121 entries: ', total_t121_entries)
     print('Total number of Transnetyx entries: ', total_transnetyx_entries)
-    print('Percentage of T121 retests: ', round(percent_retest_t121, 1))
-    print('Percentage of T121 failed: ', round(percent_failed_t121, 1))
-    print('Percentage of Transnetyx retests: ', round(percent_retest_transnetyx, 1))
-    print('Percentage of Transnetyx failed: ', round(percent_failed_transnetyx, 1))
+
+    print('Total number of T121 plates with uploads: ', total_t121_plates)
+    print('Total number of Transnetyx plates with uploads: ', total_transnetyx_plates)
+
+    print('Percentage of T121 entries which are retests: ', round(percent_retest_t121, 1))
+    print('Percentage of T121 entries which are failed: ', round(percent_failed_t121, 1))
+
+    print('Percentage of Transnetyx entries which are retests: ', round(percent_retest_transnetyx, 1), '%')
+    print('Percentage of Transnetyx entries which are failed: ', round(percent_failed_transnetyx, 1), '%')
 
 
 while True:
     entries_harvest()
-
-"""
-Suggestions for improvement, additions, alterations:
-*important*
-- *Count number of different plate IDs to give some more indication of outputs for both T121 and Transnetyx*
-- * Count number of different mice genotyped to give another indication of output beside plates and entries*
-
-- Highlight the most common assay names
-- Bring up the top 10 most error prone assay names for each walk.
-- ?bring up the top 10 plates with the most errors associated with them?
-- Turn the whole thing into a class? Using methods would cut down on repetition? Or maybe just use different functions?
-
-"""

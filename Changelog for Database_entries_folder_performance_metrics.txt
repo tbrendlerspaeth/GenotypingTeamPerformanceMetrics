@@ -31,3 +31,12 @@ and generating the dataframes. (Time taken still remains.)
 Changes:
 - Added and altered some comments.
 - The minutes and seconds for time taken for harvesting and editing now round to whole numbers
+
+19/01/2020
+Changes:
+- Attempts made at tidying the script by altering spacing of lines and removing comments.
+- Modified some of the strings.
+- Added a PermissionError and except statement for unknown error to the try statement when reading in the excel files.
+
+Additions:
+- The script now prints out the total number of plates with uploads for T121 and Transnetyx.
