@@ -32,6 +32,7 @@ Changes:
 - Added and altered some comments.
 - The minutes and seconds for time taken for harvesting and editing now round to whole numbers
 
+
 19/01/2020
 Changes:
 - Attempts made at tidying the script by altering spacing of lines and removing comments.
@@ -40,3 +41,20 @@ Changes:
 
 Additions:
 - The script now prints out the total number of plates with uploads for T121 and Transnetyx.
+
+
+20/01/2020
+Fixes:
+- Added a % symbol to the readouts strings for percentage T121 retests and failed.
+
+Additions:
+- Re-added time printout for when the script starts collecting, editing and generating data.
+- Added a string reading "Time finished with generating 'df_all_entries' with a current time printout. This was added to
+check how long the script needed to read all the files for an entire yaer folder and to ensure that the step of creating
+df_all_entries was reached during times the script took long to generate data for a year folder.
+- Added a string reading "Time finished with splitting 'df_all_entries' into T121 and Transnetyx DFs: " with a current time
+printout to check if and when the script had reached the stage of generating the two dataframes for T121 and Transnetyx.
+
+Changes:
+- Moved the "time taken" block towards the end of the script, just before the final data printouts.
+It now reads "Time taken to generate data: ".

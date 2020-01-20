@@ -1,11 +1,8 @@
 """
 This script is designed to collect and analyse data relevant to the work performance of a genotyping
 team from the folders were database uploads containing results are stored.
-
 created by TABS
-
 version 2020.01.19
-
 """
 
 import os
@@ -17,6 +14,8 @@ def entries_harvest():
     entries_folder = input(r'Enter folder path of a database entries folder: ')
 
     time_started = datetime.datetime.now()
+    print("Time started: ", time_started.time())
+
     df_all_entries = pd.DataFrame()
 
     for foldername, subfolders, filenames in os.walk(entries_folder):
@@ -34,6 +33,10 @@ def entries_harvest():
     df_all_entries.dropna(axis=0, how='all', inplace=True)
     df_all_entries.dropna(axis=1, how='all', inplace=True)
     df_all_entries.drop_duplicates(keep='first', inplace=True)
+
+
+    time_all_entries = datetime.datetime.now()
+    print("Time finished with generating 'df_all_entries': ", time_all_entries.time())
 
 
     df_transnetyx = pd.DataFrame()
@@ -71,10 +74,9 @@ def entries_harvest():
         print("'df_all_entries' does not contain a 'Plate' column.")
 
 
-    time_finished = datetime.datetime.now()
-    elapsed_time = time_finished - time_started
-    elapsed_time = divmod(elapsed_time.total_seconds(), 60)
-    print('Time taken for harvesting and editing: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]), 'seconds.')
+    time_t121_and_trnsntyx_dfs = datetime.datetime.now()
+    print("Time finished with splitting 'df_all_entries' into T121 and Transnetyx DFs: ",
+          time_t121_and_trnsntyx_dfs.time())
 
 
     total_t121_entries = len(df_t121)
@@ -121,6 +123,13 @@ def entries_harvest():
         print('The script found no entries with Transnetyx plates.')
 
 
+    time_finished = datetime.datetime.now()
+    elapsed_time = time_finished - time_started
+    elapsed_time = divmod(elapsed_time.total_seconds(), 60)
+    print('Time taken to generate data: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]),
+          'seconds.')
+
+
     print('Total number of database entries: ', total_entries)
 
     print('Total number of T121 entries: ', total_t121_entries)
@@ -129,8 +138,8 @@ def entries_harvest():
     print('Total number of T121 plates with uploads: ', total_t121_plates)
     print('Total number of Transnetyx plates with uploads: ', total_transnetyx_plates)
 
-    print('Percentage of T121 entries which are retests: ', round(percent_retest_t121, 1))
-    print('Percentage of T121 entries which are failed: ', round(percent_failed_t121, 1))
+    print('Percentage of T121 entries which are retests: ', round(percent_retest_t121, 1), '%')
+    print('Percentage of T121 entries which are failed: ', round(percent_failed_t121, 1), '%')
 
     print('Percentage of Transnetyx entries which are retests: ', round(percent_retest_transnetyx, 1), '%')
     print('Percentage of Transnetyx entries which are failed: ', round(percent_failed_transnetyx, 1), '%')
