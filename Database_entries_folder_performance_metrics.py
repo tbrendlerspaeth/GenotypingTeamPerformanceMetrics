@@ -39,39 +39,10 @@ def entries_harvest():
     print("Time finished with generating 'df_all_entries': ", time_all_entries.time())
 
 
-    df_transnetyx = pd.DataFrame()
-    df_t121 = pd.DataFrame()
-    try:
-        for plate in df_all_entries['Plate Barcode']:
-            try:
-                if plate[0] == 'T':
-                    transnetyx_plate = pd.DataFrame(df_all_entries[df_all_entries['Plate Barcode'] == plate])
-                    df_transnetyx = df_transnetyx.append(transnetyx_plate, ignore_index=True)
-                    df_transnetyx.drop_duplicates(keep='first', inplace=True)
-                else:
-                    t121_plate = pd.DataFrame(df_all_entries[df_all_entries['Plate Barcode'] == plate])
-                    df_t121 = df_t121.append(t121_plate, ignore_index=True)
-                    df_t121.drop_duplicates(keep='first', inplace=True)
-            except:
-                continue
-    except KeyError:
-        print("'df_all_entries' does not contain a 'Plate Barcode' column.")
+    df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T')]
+    df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
 
-    try:
-        for plate in df_all_entries['Plate']:
-            try:
-                if plate[0] == 'T':
-                    transnetyx_plate = pd.DataFrame(df_all_entries[df_all_entries['Plate'] == plate])
-                    df_transnetyx = df_transnetyx.append(transnetyx_plate, ignore_index=True)
-                    df_transnetyx.drop_duplicates(keep='first', inplace=True)
-                else:
-                    t121_plate = pd.DataFrame(df_all_entries[df_all_entries['Plate'] == plate])
-                    df_t121 = df_t121.append(t121_plate, ignore_index=True)
-                    df_t121.drop_duplicates(keep='first', inplace=True)
-            except:
-                continue
-    except KeyError:
-        print("'df_all_entries' does not contain a 'Plate' column.")
+    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
 
 
     time_t121_and_trnsntyx_dfs = datetime.datetime.now()
@@ -106,7 +77,7 @@ def entries_harvest():
         df_transnetyx_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
         total_transnetyx_plates = len(df_transnetyx_plate.append(df_transnetyx_platebarcode).drop_duplicates())
     except KeyError:
-        print("'df_t121 does not' does not contain a 'Plate Barcode' column.")
+        print("'df_transnetyx does not' does not contain a 'Plate Barcode' column.")
 
 
     failed_t121 = len(df_t121[df_t121.Genotype.isin(['Failed', 'failed', 'failed ', ' Failed '])])

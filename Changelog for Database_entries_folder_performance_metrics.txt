@@ -58,3 +58,16 @@ printout to check if and when the script had reached the stage of generating the
 Changes:
 - Moved the "time taken" block towards the end of the script, just before the final data printouts.
 It now reads "Time taken to generate data: ".
+
+
+22/01/2020
+Changes:
+- The script now uses a different method to create the DFs for Transnetyx and T121 by filtering df_all_entries based on whether
+the first letter of the plate is a 'T' or not. Gone are the for loops and replaced with a much simpler subsetting of 
+df_all_entries using a boolean variable. This has drastically cut down the time for this filtering, allowing the script to
+tackle entire year folders and also reduced the number of lines of code for easier oversight.
+
+Fixes:
+- Changed a string reading: "'df_t121 does not' does not contain a 'Plate Barcode' column." to 
+"'df_transnetyx does not' does not contain a 'Plate Barcode' column." for accuracy to prevent confusion when diagnosing 
+except statements.
