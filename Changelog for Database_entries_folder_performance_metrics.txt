@@ -71,3 +71,11 @@ Fixes:
 - Changed a string reading: "'df_t121 does not' does not contain a 'Plate Barcode' column." to 
 "'df_transnetyx does not' does not contain a 'Plate Barcode' column." for accuracy to prevent confusion when diagnosing 
 except statements.
+
+
+23/01/2020
+Changes:
+- Removed printout of time taken to split df_all_entries into separate DFS for T121 and Transnetyx. It was no longer
+needed as a diagnostic tool after the replacement of the for loops for sorting by boolean variable subsetting as this cut
+down the time drastically.
+

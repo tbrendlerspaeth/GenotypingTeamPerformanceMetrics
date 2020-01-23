@@ -45,10 +45,6 @@ def entries_harvest():
     df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
 
 
-    time_t121_and_trnsntyx_dfs = datetime.datetime.now()
-    print("Time finished with splitting 'df_all_entries' into T121 and Transnetyx DFs: ",
-          time_t121_and_trnsntyx_dfs.time())
-
 
     total_t121_entries = len(df_t121)
     total_transnetyx_entries = len(df_transnetyx)
