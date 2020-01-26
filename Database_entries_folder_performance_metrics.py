@@ -2,7 +2,7 @@
 This script is designed to collect and analyse data relevant to the work performance of a genotyping
 team from the folders were database uploads containing results are stored.
 created by TABS
-version 2020.01.19
+version 2020.01.26
 """
 
 import os
@@ -35,20 +35,37 @@ def entries_harvest():
     df_all_entries.drop_duplicates(keep='first', inplace=True)
 
 
+
+
     time_all_entries = datetime.datetime.now()
     print("Time finished with generating 'df_all_entries': ", time_all_entries.time())
 
 
-    df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T')]
-    df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
-
-    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
 
 
+    df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T') |
+                                   (df_all_entries['Plate Barcode'].str[0] == 'T')]
 
-    total_t121_entries = len(df_t121)
+    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0].isin(['S', 's', 'C', 'c'])) |
+                             (df_all_entries['Plate Barcode'].str[0].isin(['S', 's', 'C', 'c']))]
+
+
+    df_gender = pd.DataFrame()
+
+    try:
+        df_gender = df_all_entries['Gender'].dropna()
+    except KeyError:
+        print("'df_all_entries' has no 'Gender' column. It seems no gender uploads could be found.")
+
+
+
+
+
+    total_t121_entries = len(df_t121) + len(df_gender)
     total_transnetyx_entries = len(df_transnetyx)
     total_entries = len(df_all_entries)
+
+
 
 
     total_t121_plates = 0
@@ -63,6 +80,8 @@ def entries_harvest():
     except KeyError:
         print("'df_t121 does not' does not contain a 'Plate Barcode' column.")
 
+
+
     total_transnetyx_plates = 0
     try:
         df_transnetyx_plate = df_transnetyx[['Plate']].dropna()
@@ -76,10 +95,23 @@ def entries_harvest():
         print("'df_transnetyx does not' does not contain a 'Plate Barcode' column.")
 
 
+
+
     failed_t121 = len(df_t121[df_t121.Genotype.isin(['Failed', 'failed', 'failed ', ' Failed '])])
+    failed_t121 = failed_t121 + len(df_gender.isin(['U', 'u']))
+
     retest_t121 = len(df_t121[df_t121.Genotype.isin(['Retest', 'retest', 'retest ', 'Retest '])])
+
     percent_failed_t121 = (failed_t121 / total_t121_entries) * 100
     percent_retest_t121 = (retest_t121 / total_t121_entries) * 100
+
+
+
+
+    failed_transnetyx = 0
+    retest_transnetyx = 0
+    percent_failed_transnetyx = 0
+    percent_retest_transnetyx = 0
 
     if total_transnetyx_entries > 0:
         failed_transnetyx = len(df_transnetyx[df_transnetyx.Genotype.isin(['Failed', 'failed', 'failed ', ' Failed '])])
@@ -90,11 +122,15 @@ def entries_harvest():
         print('The script found no entries with Transnetyx plates.')
 
 
+
+
     time_finished = datetime.datetime.now()
     elapsed_time = time_finished - time_started
     elapsed_time = divmod(elapsed_time.total_seconds(), 60)
     print('Time taken to generate data: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]),
           'seconds.')
+
+
 
 
     print('Total number of database entries: ', total_entries)
@@ -110,6 +146,7 @@ def entries_harvest():
 
     print('Percentage of Transnetyx entries which are retests: ', round(percent_retest_transnetyx, 1), '%')
     print('Percentage of Transnetyx entries which are failed: ', round(percent_failed_transnetyx, 1), '%')
+
 
 
 while True:

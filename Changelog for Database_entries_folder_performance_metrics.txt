@@ -79,3 +79,13 @@ Changes:
 needed as a diagnostic tool after the replacement of the for loops for sorting by boolean variable subsetting as this cut
 down the time drastically.
 
+
+26/01/2020
+Fixes:
+- The script should now incorporate gender uploads into its data output with the addition of df_gender.
+- Hopefully fixed an issue where incorrect boolean variable subsetting was causing an inflated number of entries to be
+counted for T121. The script filtered based on the first letter of the plate not being a 'T', likely causing it to count
+
+Changes:
+-Changed the spacing of some of the lines.
+

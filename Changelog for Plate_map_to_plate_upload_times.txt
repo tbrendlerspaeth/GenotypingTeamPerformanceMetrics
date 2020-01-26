@@ -1,0 +1,28 @@
+25/01/2020
+Current description describing the script's features: "Data is harvested from the genotyping team
+drive to determine how long a plate takes to from having a record made to
+appearing in the database uploads folder. Returns an Excel spreadsheet with 
+columns: plate_id, earliest_record, latest_record, earliest_upload, 
+latest_upload."
+
+
+26/01/2020
+Changes:
+- Removed the script's functionality to generate an Excel file with results.
+- Removed the print(df_plate_records) line.
+
+Additions:
+- The script now calculates slow (latest upload - earliest record) and fast 
+cycle times (earliest upload - earliest record) and adds them to df_final 
+rather than letting the user do this in an Excel spreadsheet.
+- Some descriptive statistics are now provided using pd.series.describe for slow
+and fast cycle times. The percentiles displayed are currently set to .25, .5,
+ .75, 0.95.
+- Another walk to capture time file created data from a second uploads folder 
+was added. The strings that prompt user to input a folder path for these two
+walks now refer to '2019' for the first and '2020' for the second input. This
+was done to capture more data for the cycle times for plates started towards the end
+of 2019 but which have uploads in 2020. This should improve the accuracy of the
+boxplots (see below).
+- Work in progress: The script generates boxplots for slow cycle times by month
+of the year (currently set to 2019).
