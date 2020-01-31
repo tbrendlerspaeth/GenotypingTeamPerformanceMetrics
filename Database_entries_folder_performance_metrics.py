@@ -42,12 +42,18 @@ def entries_harvest():
 
 
 
+    #1
+    #df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T') |
+    #                               (df_all_entries['Plate Barcode'].str[0] == 'T')]
+    #df_t121 = df_all_entries[(df_all_entries['Plate'].str[0].isin(['S', 's', 'C', 'c'])) |
+    #                         (df_all_entries['Plate Barcode'].str[0].isin(['S', 's', 'C', 'c']))]
 
-    df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T') |
-                                   (df_all_entries['Plate Barcode'].str[0] == 'T')]
 
-    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0].isin(['S', 's', 'C', 'c'])) |
-                             (df_all_entries['Plate Barcode'].str[0].isin(['S', 's', 'C', 'c']))]
+    # 2
+    df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T')]
+    df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
+    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
+
 
 
     df_gender = pd.DataFrame()
@@ -61,7 +67,8 @@ def entries_harvest():
 
 
 
-    total_t121_entries = len(df_t121) + len(df_gender)
+    #total_t121_entries = len(df_t121) + len(df_gender)
+    total_t121_entries = len(df_t121)
     total_transnetyx_entries = len(df_transnetyx)
     total_entries = len(df_all_entries)
 

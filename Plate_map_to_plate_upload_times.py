@@ -14,9 +14,24 @@ import matplotlib.pyplot as plt
 
 
 
-records_folder = input(r'Enter the folder path of a plate records folder: ')
+records_folder = input(r'Enter the folder path of the 2019 PLATE RECORDS folder: ')
 
 df_plate_record_created = pd.DataFrame()
+for foldername, subfolders, filenames in os.walk(records_folder):
+    for file in filenames:
+        plate_barcode = file[0:10].lower()
+
+        record_ctime = os.path.getctime(foldername + '\\' + file)
+
+        record_ctime = datetime.datetime.fromtimestamp(record_ctime)
+
+        df = pd.DataFrame({'plate_barcode': [plate_barcode], 'time_created': [record_ctime]})
+        df_plate_record_created = df_plate_record_created.append(df)
+
+
+
+records_folder = input(r'Enter the folder path of the 2020 PLATE RECORDS folder: ')
+
 for foldername, subfolders, filenames in os.walk(records_folder):
     for file in filenames:
         plate_barcode = file[0:10].lower()
@@ -34,10 +49,8 @@ for foldername, subfolders, filenames in os.walk(records_folder):
 df_earliest_record = df_plate_record_created.sort_values(by='time_created').drop_duplicates('plate_barcode', keep='first')
 df_earliest_record.rename(columns={'time_created': 'earliest_record'}, inplace=True)
 
-
 df_latest_record = df_plate_record_created.sort_values(by='time_created').drop_duplicates('plate_barcode', keep='last')
 df_latest_record.rename(columns={'time_created': 'latest_record'}, inplace=True)
-
 
 df_plate_records = df_earliest_record.merge(df_latest_record)
 
@@ -85,6 +98,8 @@ for foldername, subfolders, filenames in os.walk(uploads_folder):
                 continue
 
 
+
+
 df_earliest_upload = df_plate_upload_created.sort_values(by='time_created').drop_duplicates('plate_barcode', keep='first')
 df_earliest_upload.rename(columns={'time_created': 'earliest_upload'}, inplace=True)
 
@@ -105,28 +120,62 @@ df_final['slow_cycle_time'] = df_final['latest_upload'].subtract(df_final['earli
 df_final['fast_cycle_time'] = df_final['earliest_upload'].subtract(df_final['earliest_record'])
 
 
-df_slow_posonly = df_final[(df_final['slow_cycle_time'] >= datetime.timedelta(days=0))]
-print('Slow cycle time stats: \n', df_slow_posonly['slow_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
+df_final_posonly = df_final[(df_final['slow_cycle_time'] >= datetime.timedelta(days=0))]
+print('Cycle time stats: \n', df_final_posonly['slow_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
 
-df_fast_posonly = df_final[(df_final['fast_cycle_time'] >= datetime.timedelta(days=0))]
-print('\n\nFast cycle time stats: \n', df_fast_posonly['fast_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
 
 pd.to_datetime(df_final['earliest_record'])
 
-months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-cycle_time_months = []
 
-for m in months:
-    data_month = df_final[(df_final['earliest_record'].dt.month == m) & (df_final['earliest_record'].dt.year == 2019)]
-    cycle_time_months.append(data_month['slow_cycle_time'].dt.days)
+# cycle_time_months = []
 
-labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-plt.boxplot(cycle_time_months, labels=labels)
-plt.xlabel("Month when earliest record for plate created")
-plt.ylabel("Earliest record to latest upload (Days)")
-plt.title("Monthly Cycle Times for 2019 boxplot")
+
+# months2019 = [1,2,3,4,5,6,7,8,9,10,11,12]
+# for m in months2019:
+#     data_month = df_final_posonly[(df_final['earliest_record'].dt.month == m) &
+#                                   (df_final_posonly['earliest_record'].dt.year == 2019)]
+#     cycle_time_months.append(data_month['slow_cycle_time'].dt.days)
+#
+#
+# months2020 = [1]
+#
+# for m in months2020:
+#     data_month = df_final_posonly[(df_final_posonly['earliest_record'].dt.month == m) &
+#                                   (df_final_posonly['earliest_record'].dt.year == 2020)]
+#     cycle_time_months.append(data_month['slow_cycle_time'].dt.days)
+
+cycle_time_weeks = []
+labels_weeks = []
+for week in range(1,53):
+    data_week = df_final_posonly[(df_final_posonly['earliest_record'].dt.week == week) &
+                                   (df_final_posonly['earliest_record'].dt.year == 2019)]
+    cycle_time_weeks.append(data_week['slow_cycle_time'].dt.days)
+    labels_weeks.append(str(week))
+
+for week in range(1,5):
+    data_week = df_final_posonly[(df_final_posonly['earliest_record'].dt.week == week) &
+                                   (df_final_posonly['earliest_record'].dt.year == 2020)]
+    cycle_time_weeks.append(data_week['slow_cycle_time'].dt.days)
+    labels_weeks.append(str(week))
+
+
+# labels = ['Jan 19', 'Feb 19', 'Mar 19', 'Apr 19', 'May 19', 'Jun 19', 'Jul 19', 'Aug 19', 'Sept 19', 'Oct 19',
+#           'Nov 19', 'Dec 19', 'Jan 20']
+
+# plt.boxplot(cycle_time_months, labels=labels)
+plt.boxplot(cycle_time_weeks, labels=labels_weeks)
+#plt.xlabel("Month when earliest record for plate created")
+plt.xlabel("Week when earliest record for plate was created")
+plt.ylabel("Earliest record to latest upload for each plate (Days)")
+#plt.title("Boxplot for Monthly Cycle Times")
+plt.title("Boxplot for Weekly Cycle Times 2019 and 2020")
 
 plt.show()
 
-
-
+#os.chdir(input(r'Please enter the path of the folder where you wish to save your excel file of the times plate records were created: '))
+#excel_filename = input(r'Please enter the name of your excel file: ')
+#excel_filename = excel_filename + '.xlsx'
+#writer = pd.ExcelWriter(excel_filename, engine='openpyxl')
+#df_final.to_excel(writer, header=True, index=True)
+#writer.save()
+#writer.close()

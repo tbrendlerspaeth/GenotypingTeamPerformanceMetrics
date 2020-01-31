@@ -85,6 +85,7 @@ Fixes:
 - The script should now incorporate gender uploads into its data output with the addition of df_gender.
 - Hopefully fixed an issue where incorrect boolean variable subsetting was causing an inflated number of entries to be
 counted for T121. The script filtered based on the first letter of the plate not being a 'T', likely causing it to count
+empty fields too. The filter was altered to look for the first letter being an 'S' or 'C' instead for T121 plates.
 
 Changes:
 -Changed the spacing of some of the lines.
