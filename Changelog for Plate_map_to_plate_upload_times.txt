@@ -26,3 +26,22 @@ of 2019 but which have uploads in 2020. This should improve the accuracy of the
 boxplots (see below).
 - Work in progress: The script generates boxplots for slow cycle times by month
 of the year (currently set to 2019).
+
+
+
+31/01/2020
+Changes:
+- Changed some strings which requested folder paths from the user.
+- Gone is the 'fast' cycle time metric. It was not a fair measure of cycle time.
+'Slow' cycle time remains as a measure of cycle time (earliest record to latest
+upload).
+
+Additions:
+- The script now collects data for both 2019 and 2020 plate records folders.
+- The boxplots now incorporate monthly cycle time data from 2020, previously only
+2019 was included. This is currently commented out.
+- Not only do we now have monthly cycle time being box-plotted but also a similar
+code structure now does it by weeks of the year too. This gives a tighter time
+period for analysis is definitely worth considering over monthly cycle time stats 
+as a better option of metric analysis.
+- Re-added an option to save 'df_final' as an Excel file (currently commented out).

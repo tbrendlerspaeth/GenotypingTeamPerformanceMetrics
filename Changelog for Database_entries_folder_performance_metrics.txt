@@ -90,3 +90,14 @@ empty fields too. The filter was altered to look for the first letter being an '
 Changes:
 -Changed the spacing of some of the lines.
 
+
+31/01/2020
+Changes:
+- The returned to counting T121 entries as those which do not feature a plate starting with 'T' in the two plate columns.
+Testing concluded that, although this method also has issues particularly with interpretation of peformance, capturing 
+all entries which are not associated with a Transnetyx plate seemed a fair measure of T121 output.
+Gender uploads are no longer being added to the total count for T121 entries. However, gender 'U' entries are now
+counted towards the T121 failed percentage.
+
+
+
