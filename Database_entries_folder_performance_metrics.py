@@ -51,8 +51,17 @@ def entries_harvest():
 
     # 2
     df_transnetyx = df_all_entries[(df_all_entries['Plate'].str[0] == 'T')]
-    df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
-    df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
+    try:
+        df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
+    except KeyError:
+        print("'df_all_entries' does not contain a 'Plate Barcode' column.")
+
+
+    try:
+        df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
+    except KeyError:
+        print("Key Error occurred when filtering T121 entries.")
+        df_t121 = df_all_entries[df_all_entries['Plate'].str[0] != 'T']
 
 
 
@@ -80,13 +89,13 @@ def entries_harvest():
         df_t121_plate = df_t121[['Plate']].dropna()
     except KeyError:
         print("'df_t121 does not' does not contain a 'Plate' column.")
+    df_t121_platebarcode = pd.DataFrame()
     try:
         df_t121_platebarcode = df_t121[['Plate Barcode']].dropna()
         df_t121_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
-        total_t121_plates = len(df_t121_plate.append(df_t121_platebarcode).drop_duplicates())
     except KeyError:
-        print("'df_t121 does not' does not contain a 'Plate Barcode' column.")
-
+        print("'df_t121' does not does not contain a 'Plate Barcode' column.")
+    total_t121_plates = len(df_t121_plate.append(df_t121_platebarcode).drop_duplicates())
 
 
     total_transnetyx_plates = 0
@@ -94,13 +103,13 @@ def entries_harvest():
         df_transnetyx_plate = df_transnetyx[['Plate']].dropna()
     except KeyError:
         print("'df_transnetyx' does not contain a 'Plate' column.")
+    df_transnetyx_platebarcode = pd.DataFrame()
     try:
         df_transnetyx_platebarcode = df_transnetyx[['Plate Barcode']].dropna()
         df_transnetyx_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
-        total_transnetyx_plates = len(df_transnetyx_plate.append(df_transnetyx_platebarcode).drop_duplicates())
     except KeyError:
         print("'df_transnetyx does not' does not contain a 'Plate Barcode' column.")
-
+    total_transnetyx_plates = len(df_transnetyx_plate.append(df_transnetyx_platebarcode).drop_duplicates())
 
 
 

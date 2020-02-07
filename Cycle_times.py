@@ -15,8 +15,8 @@ import matplotlib.pyplot as plt
 
 
 
-records_folder = input(r'Enter the folder path of the 2019 PLATE RECORDS folder: ')
-
+# records_folder = input(r'Enter the folder path of the 2019 PLATE RECORDS folder: ')
+records_folder = r'\\file01-s0\team121\Genotyping\qPCR 2019\PLATE RECORDS'
 df_plate_record_created = pd.DataFrame()
 for foldername, subfolders, filenames in os.walk(records_folder):
     for file in filenames:
@@ -31,8 +31,8 @@ for foldername, subfolders, filenames in os.walk(records_folder):
 
 
 
-records_folder = input(r'Enter the folder path of the 2020 PLATE RECORDS folder: ')
-
+# records_folder = input(r'Enter the folder path of the 2020 PLATE RECORDS folder: ')
+records_folder = r'\\file01-s0\team121\Genotyping\qPCR 2020\PLATE RECORDS'
 for foldername, subfolders, filenames in os.walk(records_folder):
     for file in filenames:
         plate_barcode = file[0:10].lower()
@@ -58,8 +58,8 @@ df_plate_records = df_earliest_record.merge(df_latest_record)
 
 
 
-uploads_folder = input(r'Enter the folder path of your 2019 database uploads folder: ')
-
+# uploads_folder = input(r'Enter the folder path of your 2019 database uploads folder: ')
+uploads_folder = r'\\file01-s0\team121\Genotyping\Database entries\2019'
 df_plate_upload_created = pd.DataFrame()
 for foldername, subfolders, filenames in os.walk(uploads_folder):
     for file in filenames:
@@ -79,8 +79,8 @@ for foldername, subfolders, filenames in os.walk(uploads_folder):
                 continue
 
 
-uploads_folder = input(r'Enter the folder path of your 2020 database uploads folder: ')
-
+# uploads_folder = input(r'Enter the folder path of your 2020 database uploads folder: ')
+uploads_folder = r'\\file01-s0\team121\Genotyping\Database entries\2020'
 for foldername, subfolders, filenames in os.walk(uploads_folder):
     for file in filenames:
         for plate in df_plate_record_created['plate_barcode']:
@@ -117,15 +117,25 @@ df_final = df_plate_records.merge(df_plate_uploads)
 
 
 df_final['slow_cycle_time'] = df_final['latest_upload'].subtract(df_final['earliest_record'])
-
 df_final['fast_cycle_time'] = df_final['earliest_upload'].subtract(df_final['earliest_record'])
 
 
 df_final_posonly = df_final[(df_final['slow_cycle_time'] >= datetime.timedelta(days=0))]
-print('Cycle time stats: \n', df_final_posonly['slow_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
+
+# pd.to_datetime(df_final['earliest_record'])
 
 
-pd.to_datetime(df_final['earliest_record'])
+
+df_sept_dec_19 = df_final_posonly[(df_final_posonly['earliest_record'].dt.month.isin((9,10,11,12))) &
+                                   (df_final_posonly['earliest_record'].dt.year == 2019)]
+print('Cycle time stats for Sept - Dec 2019: \n', df_sept_dec_19['slow_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
+
+
+df_2020 = df_final_posonly[df_final_posonly['earliest_record'].dt.year == 2020]
+print('Cycle time stats for 2020: \n', df_2020['slow_cycle_time'].describe(percentiles=[.25, .5, .75, 0.95]))
+
+
+
 
 
 # cycle_time_months = []
@@ -147,13 +157,13 @@ pd.to_datetime(df_final['earliest_record'])
 
 cycle_time_weeks = []
 labels_weeks = []
-for week in range(1,53):
+for week in range(36,53): # week 39 = start 2nd Sept 2019
     data_week = df_final_posonly[(df_final_posonly['earliest_record'].dt.week == week) &
                                    (df_final_posonly['earliest_record'].dt.year == 2019)]
     cycle_time_weeks.append(data_week['slow_cycle_time'].dt.days)
     labels_weeks.append(str(week))
 
-for week in range(1,5):
+for week in range(1,10):
     data_week = df_final_posonly[(df_final_posonly['earliest_record'].dt.week == week) &
                                    (df_final_posonly['earliest_record'].dt.year == 2020)]
     cycle_time_weeks.append(data_week['slow_cycle_time'].dt.days)
@@ -172,6 +182,16 @@ plt.ylabel("Earliest record to latest upload for each plate (Days)")
 plt.title("Boxplot for Weekly Cycle Times 2019 and 2020")
 
 plt.show()
+
+# Should this be plotted by date of latest record instead? is the current boxplot misleading?
+
+# Could I plot mean and median cycle times for all the weeks of interest?
+
+df_flagged_plates = df_final_posonly[(df_final_posonly['slow_cycle_time'].dt.days > 7) &
+                                     (df_final_posonly['earliest_record'].dt.year == 2020)]
+
+print("Plates with a cycle time of more than 7 days in 2020: ")
+print(df_flagged_plates[['plate_barcode', 'slow_cycle_time']])
 
 #os.chdir(input(r'Please enter the path of the folder where you wish to save your excel file of the times plate records were created: '))
 #excel_filename = input(r'Please enter the name of your excel file: ')
