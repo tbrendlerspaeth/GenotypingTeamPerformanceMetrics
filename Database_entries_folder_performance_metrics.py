@@ -2,8 +2,10 @@
 This script is designed to collect and analyse data relevant to the work performance of a genotyping
 team from the folders were database uploads containing results are stored.
 created by TABS
-version 2020.01.26
+version 2020.03.30
 """
+
+print("Script loading libraries...\n")
 
 import os
 import pandas as pd
@@ -14,7 +16,7 @@ def entries_harvest():
     entries_folder = input(r'Enter folder path of a database entries folder: ')
 
     time_started = datetime.datetime.now()
-    print("Time started: ", time_started.time())
+    print("\nDatabase entries harvest running. Time started: ", time_started.time())
 
     df_all_entries = pd.DataFrame()
 
@@ -23,22 +25,18 @@ def entries_harvest():
             file_path = foldername + '\\' + file
             try:
                 df_file = pd.read_excel(file_path)
+                df_all_entries = df_all_entries.append(df_file)
             except PermissionError:
                 print('PermissionError occurred with file: ', file)
             except:
                 print('There was a problem with reading this file: ', file)
 
-            df_all_entries = df_all_entries.append(df_file)
+            
 
     df_all_entries.dropna(axis=0, how='all', inplace=True)
     df_all_entries.dropna(axis=1, how='all', inplace=True)
     df_all_entries.drop_duplicates(keep='first', inplace=True)
 
-
-
-
-    time_all_entries = datetime.datetime.now()
-    print("Time finished with generating 'df_all_entries': ", time_all_entries.time())
 
 
 
@@ -54,13 +52,12 @@ def entries_harvest():
     try:
         df_transnetyx = df_transnetyx.append(df_all_entries[df_all_entries['Plate Barcode'].str[0] == 'T'])
     except KeyError:
-        print("'df_all_entries' does not contain a 'Plate Barcode' column.")
+        pass
 
 
     try:
         df_t121 = df_all_entries[(df_all_entries['Plate'].str[0] != 'T') & (df_all_entries['Plate Barcode'].str[0] != 'T')]
     except KeyError:
-        print("Key Error occurred when filtering T121 entries.")
         df_t121 = df_all_entries[df_all_entries['Plate'].str[0] != 'T']
 
 
@@ -88,13 +85,13 @@ def entries_harvest():
     try:
         df_t121_plate = df_t121[['Plate']].dropna()
     except KeyError:
-        print("'df_t121 does not' does not contain a 'Plate' column.")
+        pass
     df_t121_platebarcode = pd.DataFrame()
     try:
         df_t121_platebarcode = df_t121[['Plate Barcode']].dropna()
         df_t121_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
     except KeyError:
-        print("'df_t121' does not does not contain a 'Plate Barcode' column.")
+        pass
     total_t121_plates = len(df_t121_plate.append(df_t121_platebarcode).drop_duplicates())
 
 
@@ -102,13 +99,13 @@ def entries_harvest():
     try:
         df_transnetyx_plate = df_transnetyx[['Plate']].dropna()
     except KeyError:
-        print("'df_transnetyx' does not contain a 'Plate' column.")
+        pass
     df_transnetyx_platebarcode = pd.DataFrame()
     try:
         df_transnetyx_platebarcode = df_transnetyx[['Plate Barcode']].dropna()
         df_transnetyx_platebarcode.rename(columns={'Plate Barcode': 'Plate'}, inplace=True)
     except KeyError:
-        print("'df_transnetyx does not' does not contain a 'Plate Barcode' column.")
+        pass
     total_transnetyx_plates = len(df_transnetyx_plate.append(df_transnetyx_platebarcode).drop_duplicates())
 
 
@@ -120,7 +117,6 @@ def entries_harvest():
 
     percent_failed_t121 = (failed_t121 / total_t121_entries) * 100
     percent_retest_t121 = (retest_t121 / total_t121_entries) * 100
-
 
 
 
@@ -139,17 +135,33 @@ def entries_harvest():
 
 
 
+    t121_mice = len(df_t121['Mouse'].drop_duplicates())
+    transnetyx_mice = len(df_transnetyx['Mouse'].drop_duplicates())
+
+
+    
+    t121_genotypes = len(df_t121['Genotype'].dropna())
+    transnetyx_genotypes = len(df_transnetyx['Genotype'].dropna())
+
+
+    t121_colonies = df_t121['Mouse'].str[0:4]
+    t121_colonies = len(t121_colonies.apply(lambda x: ''.join([i for i in str(x) if not i.isdigit()])).drop_duplicates())
+
+    transnetyx_colonies = df_transnetyx['Mouse'].str[0:4]
+    transnetyx_colonies = len(transnetyx_colonies.apply(lambda x: ''.join([i for i in str(x) if not i.isdigit()])).drop_duplicates())
+
+
 
     time_finished = datetime.datetime.now()
     elapsed_time = time_finished - time_started
     elapsed_time = divmod(elapsed_time.total_seconds(), 60)
-    print('Time taken to generate data: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]),
+    print('\nTime taken to generate data: ', round(elapsed_time[0]), 'minutes ', round(elapsed_time[1]),
           'seconds.')
 
 
 
 
-    print('Total number of database entries: ', total_entries)
+    print('\nTotal number of database entries: ', total_entries)
 
     print('Total number of T121 entries: ', total_t121_entries)
     print('Total number of Transnetyx entries: ', total_transnetyx_entries)
@@ -163,7 +175,17 @@ def entries_harvest():
     print('Percentage of Transnetyx entries which are retests: ', round(percent_retest_transnetyx, 1), '%')
     print('Percentage of Transnetyx entries which are failed: ', round(percent_failed_transnetyx, 1), '%')
 
+    print('Total number of T121 mice with uploads: ', t121_mice)
+    print('Total number of Transnetyx mice with uploads: ', transnetyx_mice)
+
+    print('Total number of T121 uploaded genotpyes: ', t121_genotypes)
+    print('Total number of Transnetyx genotypes: ', transnetyx_genotypes)
+
+    print('Total number of T121 colonies: ', t121_colonies)
+    print('Total number of Transnetyx colonies: ', transnetyx_colonies)
 
 
-while True:
-    entries_harvest()
+    
+if __name__=="__main__":
+    while True:
+        entries_harvest()
