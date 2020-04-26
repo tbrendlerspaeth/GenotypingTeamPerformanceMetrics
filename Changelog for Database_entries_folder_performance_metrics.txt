@@ -100,4 +100,41 @@ Gender uploads are no longer being added to the total count for T121 entries. Ho
 counted towards the T121 failed percentage.
 
 
+26/04/2020
+Additions:
+- Added some printed messages which inform the user on the progress of the data
+collection
+- Added in code and printouts for obtaining the number of mice with uploads,
+number of uploaded genotypes, and number of colonies for T121.
+
+Changes:
+- Removed a lot of the error messages which gave information when an except statement
+got triggered. There was redundancy there, sometimes too many would pop up, and it
+wasn't very clean to have a bunch of text pop up before the metrics printout.
+
+
+There is now a new kid on the block. We are pleased to introduce 
+Genotyping_Assignments_Report_performance_metrics.py
+
+This newcomer has so many advantages over its predecessor solving many caveats. 
+The report allowes a date range to be specified during which genotypes were 
+uploaded by specific users, giving much greater control over the timeframe 
+to be analysed, be it week, month, or year. In addition, the database is a 
+more accurate source of information than the team drive as it solves the potential
+problem the original method had that the team drive was never a truly accurate
+representation of uploads. Also, the reports offer far more information than
+the upload files do, creating the possibility for more metrics to be generated
+and for other scripts to be improved in the future.
+
+The new script captures the database report via a user input file path and creates
+a class. From there, it works very similarly to the original script creating
+three atributes by filtering the report into three separate dataframes of T21,
+Transnetyx, and all entries. Current methods can return number of entries, plates,
+mice, genotypes, and colonies for each one of the the dataframes. A method called
+"whose_data" determines which dataframe is selected via an argument for each
+results method. "get_stats" method returns strings with printouts of the metrics
+for a desired dataframe.
+
+
+
 

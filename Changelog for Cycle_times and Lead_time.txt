@@ -1,0 +1,34 @@
+26/04/2020
+
+Cycle times
+
+Additions:
+- Added some printed messages which inform the user on the progress of the data
+collection
+
+
+Changes:
+- The script now also obtains plate names from file names in the E-gels folder
+where srPCR files are deposited.
+- Commented out code which generated boxplots of cycle times by week. We
+have much juicier graphs instead now.
+- The juice: instead of a boxplot/line graph we now have a scatter plot of cycle times
+with rolling averages for mean, median, and upper control limit as rolmean + 2 * rolstd.
+The rolling averages are calculated over a window of 7 days in size and require
+a minimum of 10 data points for reliability. The decision to insist on 10 data point
+minimum inadvertently created a new measure of performance - if less than
+10 plate records are detected for a specific window, there's no line on the graph.
+I also learned how to customise the spacing on axes using plt.x/yticks with 
+numpy ranges for dates and integers. Aesthetics of the graph has also been much
+improved with YouTube university and Matplotlib documentation teaching me 
+customisation options which goes beyond simply making the lines on the graph
+a different colour.
+
+
+
+
+Lead Times
+
+Changes:
+- This script also received the same juicy code that was bestowed onto Cycle Times.
+Rolling averages and prettier aesthetics are now present here too.

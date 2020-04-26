@@ -45,3 +45,11 @@ code structure now does it by weeks of the year too. This gives a tighter time
 period for analysis is definitely worth considering over monthly cycle time stats 
 as a better option of metric analysis.
 - Re-added an option to save 'df_final' as an Excel file (currently commented out).
+
+
+
+26/04/2020 -THE END-
+This script is now redundant. We took what we learned from writing it and applied it
+to writing the Cycle Times and Lead Times programmes. It has served its purpose
+and will not be updated in the future.
+
