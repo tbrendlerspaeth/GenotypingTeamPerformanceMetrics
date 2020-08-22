@@ -46,6 +46,8 @@ class genotype_assignments:
     def num_entries(self, data_source):
         return len(self.whose_data(data_source))
 
+    def num_assay_type(self, data_source):
+        return self.whose_data(data_source)['Assay Type'].count()
 
     def num_plates(self, data_source):
         return len(self.whose_data(data_source)['Plate Barcode'].drop_duplicates())
@@ -71,14 +73,36 @@ class genotype_assignments:
         return self.all_entries['Assignment Date'].dt.date.max()
 
 
+    def num_retest(self, data_source):
+        return (self.whose_data(data_source)['Assigned Genotype'].values == 'Retest').sum()
+
+
+    def percentage_retest(self, data_source):
+        return round(self.num_retest(data_source) / self.num_entries(data_source) * 100, 1)
+
+
+    def num_failed(self, data_source):
+        return (self.whose_data(data_source)['Assigned Genotype'].values == 'Failed').sum()
+
+
+    def percentage_failed(self, data_source):
+        return round(self.num_failed(data_source) / self.num_entries(data_source) * 100, 1)
+    
+        
+
+
     def get_stats(self, data_source):
         
-        print("Metrics from", self.oldest_date(), "to", self.newest_date(), "for", data_source, ":", end="\n\n")
-        print("Number of", data_source,  "entries: ", self.num_entries(data_source))
-        print("Number of", data_source, "plates with entries: ", self.num_plates(data_source))
-        print("Number of", data_source, "mice with entries: ", self.num_mice(data_source))
-        print("Number of", data_source, "genotype entries: ", self.num_genotypes(data_source))
-        print("Number of", data_source, "colonies with entries: ", self.num_colonies(data_source))
+        print("Metrics from", self.oldest_date(), "to", self.newest_date(), "for", data_source.upper(), ":", end="\n\n")
+        print("Number of", data_source.upper(), "assay types: ", self.num_assay_type(data_source))
+        print("Number of", data_source.upper(), "plates with entries: ", self.num_plates(data_source))
+        print("Number of", data_source.upper(), "mice with entries: ", self.num_mice(data_source))
+        print("Number of", data_source.upper(), "genotype entries: ", self.num_genotypes(data_source))
+        print("Number of", data_source.upper(), "colonies with entries: ", self.num_colonies(data_source))
+        print("Percentage of", data_source.upper(), "entries which are retests: " , str(self.percentage_retest(data_source)) + "%")
+        print("Percentage of", data_source.upper(), "entries which are failed: " , str(self.percentage_failed(data_source)) + "%")
+
+        
         
 
 
@@ -88,15 +112,19 @@ if __name__=="__main__":
     while True:
     
         gen_ass_report_path = input("Please paste in the file path of the database report you wish to obtain stats for: ").strip("\"\'")
-        # gen_ass_report_path = "Z:\Genotyping\T121_metrics\Raw data\Weekly Genotype Assignments Reports\Team121_Genotype_Assignments_06-04-2020_to_12-04-2020.csv".strip("\"")
         report = genotype_assignments(gen_ass_report_path=gen_ass_report_path)
         
         report.get_stats('t121')
         print('\n\n\n')
-        #report.get_stats('transnetyx')
-        #print('\n\n\n')
+        report.get_stats('transnetyx')
+        print('\n\n\n')
         #report.get_stats('all')
 
+    #import os
+    #folder = r'Z:\Genotyping\T121_metrics\Raw data\Genotype Assignments Reports\Weekly Genotype Assignments Reports'
+    #for file in os.listdir(folder):
+     #   report = genotype_assignments(folder + "\\" + file)
+      #  report.get_stats('t121')
 
 
 

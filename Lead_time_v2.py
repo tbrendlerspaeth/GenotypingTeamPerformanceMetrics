@@ -46,7 +46,7 @@ class LeadTime:
 
             else:
                 folder_path = data
-                data = pd.Dataframe()
+                data = pd.DataFrame()
                 for foldername, subfolders, filenames in os.walk(folder_path):
                     for file in filenames:
                         file_path = foldername + '\\' + file
@@ -54,7 +54,7 @@ class LeadTime:
                 return data
 
 
-    def lead_time_plot(self, window, min_periods):
+    def lead_time_plot(self, window, min_periods): # include from and to dates?
 
         # Let's create an approximation of a Performance Behaviour Chart
         pbc_data = self.lead_time_data
@@ -92,7 +92,7 @@ class LeadTime:
 
 
 if __name__=="__main__":
-    genotype_assignments = r"Genotype_Assignments_02-09-2019_to_22-03-2020.csv"
+    genotype_assignments = r"Z:\Genotyping\T121_metrics\Raw data\Genotype Assignments Reports\Weekly Genotype Assignments Reports"
     genotype_assignments = LeadTime(genotype_assignments = genotype_assignments)
     genotype_assignments.print_lead_time_data()
     genotype_assignments.lead_time_plot(window='7D', min_periods=10)
