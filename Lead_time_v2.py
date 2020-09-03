@@ -7,6 +7,7 @@ import pandas as pd
 import os
 import matplotlib.pylab as plt
 import numpy as np
+import datetime
 
 
 class LeadTime:
@@ -54,12 +55,13 @@ class LeadTime:
                 return data
 
 
-    def lead_time_plot(self, window, min_periods): # include from and to dates?
+    def lead_time_plot(self, window, min_periods):
 
         # Let's create an approximation of a Performance Behaviour Chart
         pbc_data = self.lead_time_data
         pbc_data.set_index('Plate Received Date', inplace=True)
-        pbc_data = pbc_data.loc['20190902':]
+        pd.to_datetime(pbc_data.index)
+        pbc_data = pbc_data.loc['20200101':]
         window = window
         min_periods = min_periods
         x = pbc_data.index
@@ -81,6 +83,8 @@ class LeadTime:
         plt.grid(axis='y')
         y_max = y.max()
         plt.yticks(np.arange(0, int(y_max + 10), 10))
+        plt.xticks(np.arange(pbc_data.index[0], pbc_data.index[-1], datetime.timedelta(weeks=2)).astype(datetime.datetime), rotation=65)
+        plt.subplots_adjust(bottom=0.2)
         plt.title('Rolling Statistics for Lead Times, window = ' + str(window),
                   fontdict={'fontweight': 'bold', 'fontsize': 20})
         plt.show()
