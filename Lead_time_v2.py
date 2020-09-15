@@ -77,9 +77,9 @@ class LeadTime:
         # Plot rolling statistics:
         plt.plot(rolmean, color='green', label='Rolling Mean')
         plt.plot(rolucl, color='red', label='Rolling Upper Control Limit (mean+2*std)')
-        delta_time = pbc_data.index[-1] - pbc_data.index[0]
-        x1, y2 = [pbc_data.index[0], pbc_data.index[-1]], [delta_time.days, 0]
-        plt.plot(x1, y2, color='grey', linestyle='--', label='Number of days preceding most recent date')
+        delta_time = pbc_data['Latest upload date'][-1] - pbc_data['Latest upload date'][0]
+        x1, y2 = [pbc_data['Latest upload date'][0], pbc_data['Latest upload date'][-1]], [delta_time.days, 0]
+        plt.plot(x1, y2, color='grey', linestyle='--', label='Number of days preceding most recent upload date')
         plt.xlabel("Date plate received", fontdict={'fontsize': 16})
         plt.ylabel("Lead time (Days)", fontdict={'fontsize': 16})
         plt.legend(loc='best', fontsize=14, facecolor='white', framealpha=1)
