@@ -2,7 +2,6 @@
 Let's generate a graph that shows the numbers of plates received and uploaded by week. Additionally, it
 should also display the difference between effective in- and output as a measure of plate backlog. The data
 will be obtained from database reports.
-
 I think we're going to need a new dataframe with plates received and uploaded per week (or maybe even per day) and then received -
 uploaded for each time point in fourth column. Then plot the whole thing.
 """
@@ -19,7 +18,7 @@ import time
 print("Doing exciting things...")
 
 # Get plates database uploads
-plates_uploaded = pd.read_csv('Genotype_Assignments_01-01-2019_to_22-03-2020.csv')
+plates_uploaded = pd.read_csv('Genotype_Assignments_01-01-2020_to_22-09-2020.csv')
 
 # Transnetyx plates must be eliminated
 plates_uploaded = plates_uploaded[plates_uploaded['Plate Barcode'].str[0] != 'T']
@@ -38,7 +37,7 @@ daily_plates_uploaded.rename(columns = {'Assignment Date':'Date', 'Plate Barcode
 
 
 # Get plates received and order the data
-plates_received = pd.read_csv('Plates_received_01-01-2019_to_22-03-2020.csv')
+plates_received = pd.read_csv('Plates_received_01-01-2020_to_22-09-2020.csv')
 plates_received = plates_received[plates_received['Plate Barcode'].str[0] != 'T']
 plates_received['Assignment Date'] = pd.to_datetime(plates_received['Assignment Date'])
 plates_received.sort_values(by='Assignment Date', inplace = True)
@@ -69,15 +68,16 @@ rolling_received_sum = data['Plates received'].rolling(window='7D').mean()
 rolling_uploaded_sum = data['Plates uploaded'].rolling(window='7D').mean()
 
 plt.plot(data.index, data['Backlog size'], color='black', label="Estimated number of unfinished plates")
-plt.plot(data.index, rolling_received_sum, color='red', label='Rolling number of plates received')
+plt.plot(data.index, rolling_received_sum, color='red', label='Rolling number of plates received per day')
 # plt.plot(data.index, rolling_uploaded_sum, color='green')
-plt.bar(data.index, data['Plate gain'], color='blue', label='Plates received - uploaded')
-plt.xlabel("Date", fontdict={'fontsize':13})
-plt.ylabel("Number of plates", fontdict={'fontsize':13})
+plt.bar(data.index, data['Plate gain'], color='blue', label='Plates received - uploaded per day')
+plt.xlabel("Date", fontdict={'fontsize':16})
+plt.ylabel("Number of plates", fontdict={'fontsize':16})
+plt.title("Plate Input vs Output tracking", fontdict={'fontweight':'bold', 'fontsize':20})
 y_max = data['Backlog size'].max()
-plt.yticks(np.arange(0, int(y_max + y_max*0.2), 20))
+#plt.yticks(np.arange(0, int(y_max + y_max*0.2), 20))
 plt.grid(axis='y')
-plt.legend(loc = 'best')
+plt.legend(loc = 'best', fontsize=14, framealpha=1, facecolor='white')
 # plt.bar(data.index, data['Plates received'], color = 'red')
 plt.show()
 
@@ -98,3 +98,6 @@ plt.show()
 
 # plt.plot(weekly_plates_uploaded.unique().reset_index())
 # plt.show()
+
+
+
