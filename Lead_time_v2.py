@@ -15,6 +15,11 @@ class LeadTime:
     def __init__(self, genotype_assignments):
         df_data = self.data_process(genotype_assignments)
 
+        # CREATING MULTIPLE DFs TO SORT RECEIVED AND UPLOAD DATA SEEMS UNNECESSARY AND CONFUSING
+        # Can we just work with one df? Plate Barcode, Plate Received Date, Assignment Date, Animal Name
+        # (Mouse Name must be handled - changed to Animal Name in data_process ? Seems a legit solution
+        # Then concatenate Animal Name with Plate Barcode to create Sample
+
         received_data = df_data[['Plate Barcode', 'Plate Received Date']]
 
         upload_data = df_data[['Plate Barcode', 'Assignment Date']]
@@ -43,6 +48,7 @@ class LeadTime:
         else:
             if data.endswith(".csv"):
                 data.strip("\"\'")
+                # MUST HANDLE ANIMAL/MOUSE NAME COLUMN NAMING ISSUE
                 return pd.read_csv(data)
 
             else:
@@ -52,10 +58,11 @@ class LeadTime:
                     for file in filenames:
                         file_path = foldername + '\\' + file
                         data = data.append(pd.read_csv(file_path))
+                        # MUST HANDLE ANIMAL/MOUSE NAME COLUMN NAMING ISSUE
                 return data
 
 
-    def lead_time_plot(self, window, min_periods):
+    def lead_time_plot_plates(self, window, min_periods):
 
         # Let's create an approximation of a Performance Behaviour Chart
         pbc_data = self.lead_time_data
@@ -71,15 +78,19 @@ class LeadTime:
         # Create rolling statistics
         pbc_lead_times = pbc_data['Lead time'].dt.days
         rolmean = pbc_lead_times.rolling(window=window, min_periods=min_periods).mean()
+        rolmedian = pbc_lead_times.rolling(window=window, min_periods=min_periods).median()
         rolstd = pbc_lead_times.rolling(window=window, min_periods=min_periods).std()
         rolucl = rolmean + 2 * rolstd
 
         # Plot rolling statistics:
         plt.plot(rolmean, color='green', label='Rolling Mean')
-        plt.plot(rolucl, color='red', label='Rolling Upper Control Limit (mean+2*std)')
-        delta_time = pbc_data['Latest upload date'][-1] - pbc_data.index[0]
-        x_coords, y_coords = [pbc_data.index[0], pbc_data['Latest upload date'][-1]], [delta_time.days, 0]
-        plt.plot(x_coords, y_coords, color='blue', linestyle='--', alpha=0.5, label='Number of days preceding most recent upload date')
+        plt.plot(rolmedian, color='blue', label='Rolling Median')
+        # plt.plot(rolucl, color='red', label='Rolling Upper Control Limit (mean+2*std)')
+        delta_time = pbc_data['Latest upload date'].max() - pbc_data.index[0]
+        x_coords, y_coords = [pbc_data.index[0], pbc_data['Latest upload date'].max()], [delta_time.days, 0]
+        print("x_coords:", x_coords)
+        print("y_coords:", y_coords)
+        plt.plot(x_coords, y_coords, color='red', linestyle='--', alpha=0.5, label='Number of days preceding most recent upload date')
         plt.xlabel("Date plate received", fontdict={'fontsize': 16})
         plt.ylabel("Lead time (Days)", fontdict={'fontsize': 16})
         plt.legend(loc='best', fontsize=14, facecolor='white', framealpha=1)
@@ -103,4 +114,4 @@ if __name__=="__main__":
     genotype_assignments = r"Z:\Genotyping\T121_metrics\Raw data\Genotype Assignments Reports\Weekly Genotype Assignments Reports"
     genotype_assignments = LeadTime(genotype_assignments = genotype_assignments)
     genotype_assignments.print_lead_time_data()
-    genotype_assignments.lead_time_plot(window='7D', min_periods=10)
+    genotype_assignments.lead_time_plot_plates(window='7D', min_periods=10)
