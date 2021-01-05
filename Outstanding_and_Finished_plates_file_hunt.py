@@ -14,34 +14,28 @@ from datetime import date
 
 class assay_samples_genotype:
     def __init__(self, ass_samples_gen_report_path):
-
         ass_samples_gen_report = pd.read_csv(ass_samples_gen_report_path)
 
         # Filter out Transnetyx plates
         ass_samples_gen_report = ass_samples_gen_report[ass_samples_gen_report['Plate Barcode'].str[0] != 'T']
 
-
         # Filter out re-arrayed plates
         ass_samples_gen_report = ass_samples_gen_report[ass_samples_gen_report['Status'] != 'Rearrayed']
 
-
         # Remove alleles and genotypes not required for unfinished sample detection
-        removal_texts = ['| Kdm5b(.1):Untested']
+        removal_texts = ['Kdm5b(.1):Untested']
         for text in removal_texts:
             ass_samples_gen_report['Latest Genotype'] = ass_samples_gen_report['Latest Genotype'].apply(
                 lambda x: self.allele_genotype_remove(latest_genotype=x, removal_text=text))
 
         self.ass_samples_gen_report = ass_samples_gen_report
 
-
-        # Filter by "Untested" or "Retest" in Latest Genotype to obtain unfinished samples
+        # Filter by "Untested" or "Retest" in Latest Genotype column to obtain unfinished samples
         self.unfinished_samples = self.ass_samples_gen_report[self.ass_samples_gen_report['Latest Genotype'].str.contains('Retest') |
                                                         self.ass_samples_gen_report['Latest Genotype'].str.contains('Untested')]
 
-
         # Get list of unfinished plates
         self.unfinished_plates_list = self.unfinished_samples['Plate Barcode'].drop_duplicates(keep='first').tolist()
-
 
         # Create finished plates df
         finished_plates = self.ass_samples_gen_report[~self.ass_samples_gen_report['Plate Barcode'].isin(self.unfinished_plates_list)]
@@ -53,11 +47,9 @@ class assay_samples_genotype:
         finished_plates['Comments'] = ''
         self.finished_plates_df = finished_plates
 
-
         # Create unfinished samples df
-        # order by received date, then plate, then well sample? can we do that?
         columns = ['Animal Name', 'Latest Genotype', 'Plate Barcode', 'Well Position', 'Plate Location', 'Category', 'Plate Received Date']
-        unfinished_samples = self.unfinished_samples[self.unfinished_samples['Plate Barcode'].str[0] != 'T']
+        unfinished_samples = self.unfinished_samples
         unfinished_samples['Plate Received Date'] = pd.to_datetime(unfinished_samples['Plate Received Date'])
         unfinished_samples.sort_values(by=['Plate Received Date', 'Plate Barcode', 'Well Position'], ascending=True, inplace=True)
         self.unfinished_samples_df = unfinished_samples[columns]
@@ -68,6 +60,7 @@ class assay_samples_genotype:
         if removal_text in latest_genotype:
             latest_genotype_mod = latest_genotype.replace(removal_text, "")
             return latest_genotype_mod
+
         else:
             return latest_genotype
 
@@ -83,7 +76,7 @@ class assay_samples_genotype:
 
 
     def update_uf_samples(self, directory):
-
+        """Either saves or updates an existing Excel file of unfinished samples in a user specified folder."""
         dataframe = self.unfinished_samples_df
         dataframe['Assigned to:'] = ''
         dataframe['Completed?'] = ''
@@ -91,7 +84,6 @@ class assay_samples_genotype:
 
         excel_filename = "Unfinished_Samples"
         uf_samples_path = directory + "\\" + excel_filename +'.xlsx'
-
 
         if not os.path.isfile(path=uf_samples_path):
             print("Unfinished_Samples file not found. Creating new file...")
@@ -102,7 +94,6 @@ class assay_samples_genotype:
             old_df = pd.read_excel(uf_samples_path)
             old_columns = ['Animal Name', 'Plate Barcode', 'Assigned to:', 'Completed?', 'Comments']
             old_df = old_df[old_columns]
-            print(old_df.head())
 
             new_df = dataframe
             new_df.drop(columns=['Assigned to:', 'Completed?', 'Comments'], inplace=True)
